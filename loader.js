@@ -14,6 +14,10 @@ function loadScript(url) {
   ];
   
   cdnScripts.reduce((p, url) => p.then(() => loadScript(url)), Promise.resolve())
-    .then(() => console.log("⭐ All NEON-framework scripts loaded"))
+    .then(() => 
+        console.log("⭐ All NEON-framework scripts loaded")
+        //kan jeg kjøre en funksjon her etter at alt er lastet?
+        
+)
     .catch(console.error);
   
