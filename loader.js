@@ -11,8 +11,8 @@ function loadScript(url) {
 // Liste over CDN-URL-er som skal lastes inn
 const cdnScripts = [
 
-    "https://kaibertelsen.github.io/neonclientframe/usefunction.js",
-    "https://kaibertelsen.github.io/neonclientframe/neonApiClient.js"
+    "https://kaibertelsen.github.io/neonclientframe/neonApiClient.js",
+    "https://kaibertelsen.github.io/neonclientframe/usefunction.js"
     
 ];
 
@@ -60,7 +60,7 @@ cdnScripts.reduce((promise, script) => {
           console.error("❌ FEIL I TESTSCRIPT:", err);
         }
       });
-      
+
 
 }).catch(error => {
     console.error(error);
