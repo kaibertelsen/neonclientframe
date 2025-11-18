@@ -14,7 +14,7 @@
 
     //getNEON("products", null, null, "resp3", false, true, false);
 
-    getNEON("products", null, null, "resp3", false, true, {
+    getNEON("bbrunning", null, null, "resp3", false, true, {
       limit: 100,
       offset: 200
     });
