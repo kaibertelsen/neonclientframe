@@ -3,21 +3,22 @@
 
 
   console.log("🚀 Webflow testscript startet…");
+/*
+   // 1️⃣ TEST: GET – hent hele radenèr
+    getNEON("bbrunning",null,"webflow-gettest");
 
-   // 1️⃣ TEST: GET – hent rader
-   console.log("🔵 Tester GET...");
-   const rows =  getNEON("bbrunning",null,"webflow-gettest");
-   //const rows =  getNEON("bbrunning", ["id", "runnnr"]);
-   console.log("GET Resultat:", rows);
+    //For testing med spesifiserte responsfelt
+    getNEON("bbrunning", ["id", "runnnr"]);
 
-   // 2️⃣ TEST: POST – legg til en rad
-   /*
-   console.log("🟢 Tester POST...");
-   const newRows = await postNEON("bbrunning", [
+*/
+
+
+   // 2️⃣ TEST: POST – legg til en eller flere rader
+   postNEON("bbrunning", [
      { runnnr: 777, externalId: "webflow-test" }
    ]);
-   console.log("POST Resultat:", newRows);
-   */
+   
+   
 
    // 3️⃣ TEST: PATCH – oppdater én rad
    /*
