@@ -37,42 +37,52 @@
   }
 
   /* ------------------ GET ------------------ */
-  function getNEON(table, fields = null, where = null, responsId, useCache = false, isPublic = false) {
+  function getNEON(
+    table,
+    fields = null,
+    where = null,
+    responsId,
+    useCache = false,
+    isPublic = false,
+    pagination = null   // <-- her kan du sende objekt eller false
+  ) {
     let url = `${API_BASE}/api/${table}`;
     const params = new URLSearchParams();
   
-    if (fields?.length) {
-      params.set("fields", fields.join(","));
+    if (fields?.length) params.set("fields", fields.join(","));
+    if (where) Object.entries(where).forEach(([k, v]) => params.set(k, v));
+    if (useCache) params.set("cache", "1");
+  
+    // Pagination bare hvis pagination er et objekt
+    if (pagination && typeof pagination === "object") {
+      if (pagination.limit) params.set("limit", pagination.limit);
+      if (pagination.offset) params.set("offset", pagination.offset);
     }
   
-    if (where) {
-      Object.entries(where).forEach(([key, value]) => params.set(key, value));
-    }
+    // Hvis pagination === false ➜ legg INGENTING til
+    // Da henter backend ALLE rader
   
-    if (useCache) {
-      params.set("cache", "1");
-    }
+    if ([...params].length > 0) url += `?${params.toString()}`;
   
-    if ([...params].length > 0) {
-      url += `?${params.toString()}`;
-    }
-  
-    const options = isPublic
-      ? {} // 🔓 ingen headers
-      : { headers: buildHeaders() }; // 🔒 authenticated
+    const options = isPublic ? {} : { headers: buildHeaders() };
   
     fetch(url, options)
       .then(res => res.json())
-      .then(json => {
+      .then(json =>
         apiresponse(
           {
             rows: json.rows,
             cached: json.cached,
+            limit: json.limit,
+            offset: json.offset,
+            count: json.count
           },
           responsId
-        );
-      });
+        )
+      );
   }
+  
+  
   
   
   

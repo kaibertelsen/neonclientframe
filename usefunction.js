@@ -12,6 +12,15 @@
     // hente alle felt i tabellen, public tabell
     getNEON("bbrunning", null, null, "resp1", false, true);
 
+    getNEON("products", null, null, "resp3", false, true, false);
+
+    getNEON("products", null, null, "resp3", false, true, {
+      limit: 100,
+      offset: 200
+    });
+    
+
+
   /*
     //Hente alle rader men kun spesifiserte felt i hver rad
     getNEON("bbrunning", ["id", "runnnr"], null, "test1");
