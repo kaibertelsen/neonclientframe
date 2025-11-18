@@ -22,8 +22,6 @@
         return promise.then(() => loadScript(script));
     }, Promise.resolve()).then(() => {
         console.log("All scripts loaded");
-        startTesting(); // Kall testfunksjonen etter at alle skriptene er lastet
-
     }).catch(error => {
         console.error(error);
     });
