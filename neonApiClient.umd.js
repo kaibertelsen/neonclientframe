@@ -82,9 +82,9 @@
     });
 
     if (!res.ok) throw new Error(`PATCH failed: ${res.status}`);
-
+    const json = await res.json();
    
-    apiresponse(res.json(),responsId);
+    apiresponse(json.updated,responsId);
   }
 
   /* ----------------- DELETE ----------------- */

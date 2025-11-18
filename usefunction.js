@@ -4,16 +4,19 @@
 
   console.log("🚀 Webflow testscript startet…");
 
-   // 1️⃣ TEST: GET – hent hele radenèr
+   //GET
+   //getNEON("tabelnavn", ["sesponsfeltnavn1", "sesponsfeltnavn2"], { feltnavn: inholderverdi }, "responsid");
+   /*
+   //hente alle felt i tabellen
     getNEON("bbrunning",null, null, "test0");
 
-    //For testing med spesifiserte responsfelt
+    //Hente alle rader men kun spesifiserte felt i hver rad
     getNEON("bbrunning", ["id", "runnnr"], null, "test1");
 
-    //For testing med where-klausul
+    //Hente spesifikke rader basert på betingelse verdi i filter
     //getNEON("bbrunning", ["id", "runnnr"], { id: 1302 }, "test2");
      getNEON("bbrunning", ["id", "runnnr"], { runnnr: 777 });
-
+  */
 
 
 /*
@@ -27,11 +30,10 @@
    
 
    // 3️⃣ TEST: PATCH – oppdater én rad
-   /*
-   console.log("🟡 Tester PATCH...");
-   const updated = await patchNEON("bbrunning", 1, { runnnr: 4444 });
-   console.log("PATCH Resultat:", updated);
-   */
+
+   const updated = patchNEON("bbrunning", 1, { runnnr: 88888 });
+
+   
 
    // 4️⃣ TEST: DELETE – slett rad
    /*
