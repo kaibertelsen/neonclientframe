@@ -37,7 +37,7 @@
   }
 
   /* ------------------ GET ------------------ */
-  function getNEON(table, fields = null, where = null, responsId) {
+  function getNEON(table, fields = null, where = null, responsId, useCache = false) {
     let url = `${API_BASE}/api/${table}`;
     const params = new URLSearchParams();
   
@@ -49,14 +49,28 @@
       Object.entries(where).forEach(([key, value]) => params.set(key, value));
     }
   
+    if (useCache) {
+      params.set("cache", "1");
+    }
+  
     if ([...params].length > 0) {
       url += `?${params.toString()}`;
     }
   
     fetch(url, { headers: buildHeaders() })
       .then(res => res.json())
-      .then(json => apiresponse(json.rows, responsId));
+      .then(json => {
+        // Send cached-status videre hvis du vil bruke eller vise det
+        apiresponse(
+          {
+            rows: json.rows,
+            cached: json.cached,
+          },
+          responsId
+        );
+      });
   }
+  
   
 
   /* ------------------ POST ------------------ */

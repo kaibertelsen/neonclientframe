@@ -16,6 +16,10 @@
     //Hente spesifikke rader basert på betingelse verdi i filter
     //getNEON("bbrunning", ["id", "runnnr"], { id: 1302 }, "test2");
      getNEON("bbrunning", ["id", "runnnr"], { runnnr: 777 });
+
+
+      getNEON("bbrunning", ["id"], null, responsId, true);   // cached
+      getNEON("bbrunning", ["id"], null, responsId, false);  // live
   */
 
 
