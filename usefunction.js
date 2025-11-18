@@ -6,10 +6,10 @@
 
    //GET
    //getNEON("tabelnavn", ["sesponsfeltnavn1", "sesponsfeltnavn2"], { feltnavn: inholderverdi }, "responsid");
-   /*
+ 
    //hente alle felt i tabellen
-    getNEON("bbrunning",null, null, "test0");
-
+    getNEON("bbrunning",null, null, "test0", true); // cached
+  /*
     //Hente alle rader men kun spesifiserte felt i hver rad
     getNEON("bbrunning", ["id", "runnnr"], null, "test1");
 
@@ -37,11 +37,12 @@
    // 3️⃣ TEST: PATCH – oppdater én rad
    //patchNEON("tabellnavn", radid, { feltnavn: verdi });
    //patchNEON("bbrunning", 1, { runnnr: 88888 });
-
+/*
    patchNEON("bbrunning", [
     { id: 1309, fields: { runnnr: 100 } },
     { id: 1310, fields: { externalId: "UPDATED" } }
   ]);
+  */
 
    // 4️⃣ TEST: DELETE – slett rad
    /*
