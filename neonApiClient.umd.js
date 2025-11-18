@@ -61,9 +61,9 @@
     });
 
     if (!res.ok) throw new Error(`POST failed: ${res.status}`);
-
+    const json = await res.json();
   
-    apiresponse(res.json(),responsId);
+    apiresponse(json.inserted,responsId);
   }
 
   /* ----------------- PATCH ------------------ */
