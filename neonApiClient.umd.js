@@ -37,7 +37,7 @@
   }
 
   /* ------------------ GET ------------------ */
-  function getNEON(table, fields = null, where = null, responsId, useCache = false) {
+  function getNEON(table, fields = null, where = null, responsId, useCache = false, isPublic = false) {
     let url = `${API_BASE}/api/${table}`;
     const params = new URLSearchParams();
   
@@ -57,10 +57,13 @@
       url += `?${params.toString()}`;
     }
   
-    fetch(url, { headers: buildHeaders() })
+    const options = isPublic
+      ? {} // 🔓 ingen headers
+      : { headers: buildHeaders() }; // 🔒 authenticated
+  
+    fetch(url, options)
       .then(res => res.json())
       .then(json => {
-        // Send cached-status videre hvis du vil bruke eller vise det
         apiresponse(
           {
             rows: json.rows,
@@ -70,6 +73,7 @@
         );
       });
   }
+  
   
   
 

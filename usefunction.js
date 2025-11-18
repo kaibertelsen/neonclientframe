@@ -8,7 +8,10 @@
    //getNEON("tabelnavn", ["sesponsfeltnavn1", "sesponsfeltnavn2"], { feltnavn: inholderverdi }, "responsid");
  
    //hente alle felt i tabellen
-    getNEON("bbrunning",null, null, "test0", true); // cached
+    //getNEON("bbrunning",null, null, "test0", true); // cached
+    // hente alle felt i tabellen, public tabell
+    getNEON("bbrunning", null, null, "resp1", false, true);
+
   /*
     //Hente alle rader men kun spesifiserte felt i hver rad
     getNEON("bbrunning", ["id", "runnnr"], null, "test1");
