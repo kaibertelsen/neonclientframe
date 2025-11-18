@@ -92,13 +92,7 @@
     return res.json();
   }
 
-  // Expose globally
-  global.neon = {
-    getNEON,
-    postNEON,
-    patchNEON,
-    delNEON,
-  };
+
 
   console.log("Neon API Client (UMD) loaded.");
 
