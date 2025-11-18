@@ -1,12 +1,12 @@
 // Testscript for Webflow som tester NEON API-klienten
 
 
-document.addEventListener("DOMContentLoaded", async () => { 
+function startTesting(){
   console.log("🚀 Webflow testscript startet…");
 
    // 1️⃣ TEST: GET – hent rader
    console.log("🔵 Tester GET...");
-   const rows = await getNEON("bbrunning", ["id", "runnnr"]);
+   const rows =  getNEON("bbrunning", ["id", "runnnr"]);
    console.log("GET Resultat:", rows);
 
    // 2️⃣ TEST: POST – legg til en rad
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
    */
 
 
-   });
+   };
 
 
 

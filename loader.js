@@ -21,15 +21,8 @@
         return promise.then(() => loadScript(script));
     }, Promise.resolve()).then(() => {
         console.log("All scripts loaded");
-        document.addEventListener("DOMContentLoaded", async () => { 
-            console.log("🚀 Webflow testscript startet…");
-          
-             // 1️⃣ TEST: GET – hent rader
-             console.log("🔵 Tester GET...");
-             const rows = await getNEON("bbrunning", ["id", "runnnr"]);
-             console.log("GET Resultat:", rows);}
-            );
-            
+        startTesting(); // Kall testfunksjonen etter at alle skriptene er lastet
+
     }).catch(error => {
         console.error(error);
     });
