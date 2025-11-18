@@ -1,16 +1,6 @@
 // Testscript for Webflow som tester NEON API-klienten
-document.addEventListener("DOMContentLoaded", async () => {
-  console.log("🚀 Webflow testscript startet…");
+console.log("🚀 Webflow testscript startet…");
 
-  // Sjekk at biblioteket er lastet
-  if (!window.neon) {
-    console.error("❌ neonApiClient er IKKE lastet!");
-    return;
-  }
-
-  const { getNEON, postNEON, patchNEON, delNEON } = window.neon;
-
-  try {
 
     // 1️⃣ TEST: GET – hent rader
     console.log("🔵 Tester GET...");
@@ -40,7 +30,3 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("DELETE Resultat:", deleted);
     */
 
-  } catch (err) {
-    console.error("❌ FEIL I TESTSCRIPT:", err);
-  }
-});

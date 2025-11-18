@@ -1,5 +1,5 @@
 // UMD module for Neon API Client
-(function (global) {
+
   const API_BASE = "https://attentiocloud-api.vercel.app";
 
   function getToken() {
@@ -101,4 +101,4 @@
   };
 
   console.log("Neon API Client (UMD) loaded.");
-})(window);
+
