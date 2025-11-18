@@ -37,7 +37,7 @@
   }
 
   /* ------------------ GET ------------------ */
-  async function getNEON(table, fields = null) {
+  async function getNEON(table, fields = null,responsId) {
     let url = `${API_BASE}/api/${table}`;
 
     if (fields && fields.length > 0) {
@@ -48,11 +48,12 @@
     if (!res.ok) throw new Error(`GET failed: ${res.status}`);
 
     const json = await res.json();
-    return json.rows;
+    
+    apiresponse(json.rows,responsId); // Call apiresponse with the fetched data and responsId
   }
 
   /* ------------------ POST ------------------ */
-  async function postNEON(table, data) {
+  async function postNEON(table, data,responsId) {
     const res = await fetch(`${API_BASE}/api/${table}`, {
       method: "POST",
       headers: buildHeaders(),
@@ -61,11 +62,12 @@
 
     if (!res.ok) throw new Error(`POST failed: ${res.status}`);
 
-    return res.json();
+  
+    apiresponse(res.json(),responsId);
   }
 
   /* ----------------- PATCH ------------------ */
-  async function patchNEON(table, rowId, fields) {
+  async function patchNEON(table, rowId, fields,responsId) {
     const res = await fetch(`${API_BASE}/api/${table}?id=${rowId}`, {
       method: "PATCH",
       headers: buildHeaders(),
@@ -74,11 +76,12 @@
 
     if (!res.ok) throw new Error(`PATCH failed: ${res.status}`);
 
-    return res.json();
+   
+    apiresponse(res.json(),responsId);
   }
 
   /* ----------------- DELETE ----------------- */
-  async function delNEON(table, rowId) {
+  async function delNEON(table, rowId,responsId) {
     const res = await fetch(
       `${API_BASE}/api/${table}?field=id&value=${rowId}`,
       {
@@ -89,10 +92,7 @@
 
     if (!res.ok) throw new Error(`DELETE failed: ${res.status}`);
 
-    return res.json();
+    apiresponse(res.json(),responsId);
   }
 
-
-
-  console.log("Neon API Client (UMD) loaded.");
 
