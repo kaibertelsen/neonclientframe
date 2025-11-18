@@ -5,14 +5,14 @@
   console.log("🚀 Webflow testscript startet…");
 
    // 1️⃣ TEST: GET – hent hele radenèr
-    //getNEON("bbrunning",null,"webflow-gettest");
+    getNEON("bbrunning",null, null, "test0");
 
     //For testing med spesifiserte responsfelt
-    //getNEON("bbrunning", ["id", "runnnr"]);
+    getNEON("bbrunning", ["id", "runnnr"], null, "test1");
 
     //For testing med where-klausul
-    getNEON("bbrunning", ["id", "runnnr"], { id: 1302 });
-   // getNEON("bbrunning", ["id", "runnnr"], { runnnr: 777 });
+    //getNEON("bbrunning", ["id", "runnnr"], { id: 1302 }, "test2");
+     getNEON("bbrunning", ["id", "runnnr"], { runnnr: 777 });
 
 
 
