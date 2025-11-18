@@ -74,18 +74,22 @@
   }
 
   /* ----------------- PATCH ------------------ */
-  async function patchNEON(table, rowId, fields,responsId) {
-    const res = await fetch(`${API_BASE}/api/${table}?id=${rowId}`, {
+  async function patchNEON(table, rowId, fields, responsId) {
+    const res = await fetch(`${API_BASE}/api/${table}`, {
       method: "PATCH",
       headers: buildHeaders(),
-      body: JSON.stringify(fields),
+      body: JSON.stringify({
+        id: rowId,
+        data: fields, // backend forventer "data"
+      }),
     });
-
+  
     if (!res.ok) throw new Error(`PATCH failed: ${res.status}`);
+    
     const json = await res.json();
-   
-    apiresponse(json.updated,responsId);
+    apiresponse(json.rows, responsId); 
   }
+  
 
   /* ----------------- DELETE ----------------- */
   async function delNEON(table, rowId,responsId) {
