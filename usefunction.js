@@ -31,9 +31,13 @@
    
 
    // 3️⃣ TEST: PATCH – oppdater én rad
-   patchNEON("bbrunning", 1, { runnnr: 88888 });
+   //patchNEON("tabellnavn", radid, { feltnavn: verdi });
+   //patchNEON("bbrunning", 1, { runnnr: 88888 });
 
-   
+   patchNEON("bbrunning", [
+    { id: 1309, fields: { runnnr: 100 } },
+    { id: 1310, fields: { externalId: "UPDATED" } }
+  ]);
 
    // 4️⃣ TEST: DELETE – slett rad
    /*

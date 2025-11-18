@@ -74,21 +74,42 @@
   }
 
   /* ----------------- PATCH ------------------ */
-  async function patchNEON(table, rowId, fields, responsId) {
+  async function patchNEON(table, idOrList, fields, responsId) {
+    let payload;
+  
+    // --- 1️⃣ Single update ---
+    if (typeof idOrList === "number") {
+      payload = {
+        id: idOrList,
+        data: fields
+      };
+    } 
+    
+    // --- 2️⃣ Bulk update ---
+    else if (Array.isArray(idOrList)) {
+      // Format: [{ id, fields }, ...]
+      payload = idOrList.map(item => ({
+        id: item.id,
+        fields: item.fields
+      }));
+    } 
+    
+    else {
+      throw new Error("Invalid patch arguments");
+    }
+  
     const res = await fetch(`${API_BASE}/api/${table}`, {
       method: "PATCH",
       headers: buildHeaders(),
-      body: JSON.stringify({
-        id: rowId,
-        data: fields, // backend forventer "data"
-      }),
+      body: JSON.stringify(payload),
     });
   
     if (!res.ok) throw new Error(`PATCH failed: ${res.status}`);
-    
+  
     const json = await res.json();
-    apiresponse(json.rows, responsId); 
+    apiresponse(json.rows, responsId);
   }
+  
   
 
   /* ----------------- DELETE ----------------- */
