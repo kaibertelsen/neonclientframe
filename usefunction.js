@@ -15,7 +15,9 @@
 
    // 2️⃣ TEST: POST – legg til en eller flere rader
    postNEON("bbrunning", [
-     { runnnr: 777, externalId: "webflow-test" }
+     { runnnr: 777, externalId: "webflow-test" },
+      { runnnr: 888, externalId: "webflow-test" },
+      { runnnr: 999, externalId: "webflow-test" }
    ]);
    
    
