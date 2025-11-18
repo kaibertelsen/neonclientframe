@@ -1,8 +1,8 @@
 // Testscript for Webflow som tester NEON API-klienten
-console.log("🚀 Webflow testscript startet…");
+
 
 document.addEventListener("DOMContentLoaded", async () => { 
-
+  console.log("🚀 Webflow testscript startet…");
 
    // 1️⃣ TEST: GET – hent rader
    console.log("🔵 Tester GET...");
