@@ -10,9 +10,9 @@
    //hente alle felt i tabellen
     //getNEON("bbrunning",null, null, "test0", true); // cached
     // hente alle felt i tabellen, public tabell
-    getNEON("bbrunning", null, null, "resp1", false, true);
+    //getNEON("bbrunning", null, null, "resp1", false, true);
 
-    getNEON("products", null, null, "resp3", false, true, false);
+    //getNEON("products", null, null, "resp3", false, true, false);
 
     getNEON("products", null, null, "resp3", false, true, {
       limit: 100,
