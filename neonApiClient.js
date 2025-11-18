@@ -1,3 +1,4 @@
+// UMD module for Neon API Client
 (function (global) {
   const API_BASE = "https://attentiocloud-api.vercel.app";
 
