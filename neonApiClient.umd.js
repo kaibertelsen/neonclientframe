@@ -37,20 +37,27 @@
   }
 
   /* ------------------ GET ------------------ */
-  async function getNEON(table, fields = null,responsId) {
+  function getNEON(table, fields = null, where = null, responsId) {
     let url = `${API_BASE}/api/${table}`;
-
-    if (fields && fields.length > 0) {
-      url += `?fields=${fields.join(",")}`;
+    const params = new URLSearchParams();
+  
+    if (fields?.length) {
+      params.set("fields", fields.join(","));
     }
-
-    const res = await fetch(url, { headers: buildHeaders() });
-    if (!res.ok) throw new Error(`GET failed: ${res.status}`);
-
-    const json = await res.json();
-    
-    apiresponse(json.rows,responsId); // Call apiresponse with the fetched data and responsId
+  
+    if (where) {
+      Object.entries(where).forEach(([key, value]) => params.set(key, value));
+    }
+  
+    if ([...params].length > 0) {
+      url += `?${params.toString()}`;
+    }
+  
+    fetch(url, { headers: buildHeaders() })
+      .then(res => res.json())
+      .then(json => apiresponse(json.rows, responsId));
   }
+  
 
   /* ------------------ POST ------------------ */
   async function postNEON(table, data,responsId) {
