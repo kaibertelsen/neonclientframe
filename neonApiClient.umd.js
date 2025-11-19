@@ -1,41 +1,40 @@
 // UMD module for Neon API Client
 
-  const API_BASE = "https://attentiocloud-api.vercel.app";
+const API_BASE = "https://attentiocloud-api.vercel.app";
 
-  function getToken() {
-    return (
-      localStorage.getItem("_ms-mid") ||
-      document.cookie
-        .split("; ")
-        .find((r) => r.startsWith("_ms-mid="))
-        ?.split("=")[1] ||
-      null
-    );
+function getToken() {
+  return (
+    localStorage.getItem("_ms-mid") ||
+    document.cookie
+      .split("; ")
+      .find((r) => r.startsWith("_ms-mid="))
+      ?.split("=")[1] ||
+    null
+  );
+}
+
+function getPlans() {
+  const raw = localStorage.getItem("_ms-mem");
+  if (!raw) return [];
+  try {
+    const obj = JSON.parse(raw);
+    return (obj.planConnections || []).map(p => p.planId);
+  } catch (e) {
+    console.warn("Invalid _ms-mem JSON", e);
+    return [];
   }
+}
 
-  function getPlans() {
-    const raw = localStorage.getItem("_ms-mem");
-    if (!raw) return [];
-    try {
-      const obj = JSON.parse(raw);
-      return (obj.planConnections || []).map(p => p.planId);
-    } catch (e) {
-      console.warn("Invalid _ms-mem JSON", e);
-      return [];
-    }
-  }
+function buildHeaders() {
+  const token = getToken();
+  if (!token) throw new Error("Missing Memberstack token (_ms-mid)");
 
-  function buildHeaders() {
-    const token = getToken();
-    if (!token) throw new Error("Missing Memberstack token (_ms-mid)");
-
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      "X-MS-Plans": getPlans().join(","),
-    };
-  }
-
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+    "X-MS-Plans": getPlans().join(","),
+  };
+}
 
 /* ------------------ GET ------------------ */
 function getNEON({
@@ -90,78 +89,126 @@ function getNEON({
     );
 }
 
-  
-  
-  
-  
-  
+/* ------------------ POST ------------------ */
+async function postNEON({
+  table,
+  data,
+  responsId,
+  public: isPublic = false
+}) {
+  const url = `${API_BASE}/api/${table}`;
 
-  /* ------------------ POST ------------------ */
-  async function postNEON(table, data,responsId) {
-    const res = await fetch(`${API_BASE}/api/${table}`, {
-      method: "POST",
-      headers: buildHeaders(),
-      body: JSON.stringify(Array.isArray(data) ? data : [data]),
-    });
+  const options = {
+    method: "POST",
+    headers: isPublic ? {} : buildHeaders(),
+    body: JSON.stringify(Array.isArray(data) ? data : [data]),
+  };
 
-    if (!res.ok) throw new Error(`POST failed: ${res.status}`);
-    const json = await res.json();
-  
-    apiresponse(json.inserted,responsId);
-  }
+  const res = await fetch(url, options);
 
-  /* ----------------- PATCH ------------------ */
-  async function patchNEON(table, idOrList, fields, responsId) {
-    let payload;
-  
-    // --- 1️⃣ Single update ---
-    if (typeof idOrList === "number") {
-      payload = {
-        id: idOrList,
-        data: fields
-      };
-    } 
-    
-    // --- 2️⃣ Bulk update ---
-    else if (Array.isArray(idOrList)) {
-      // Format: [{ id, fields }, ...]
-      payload = idOrList.map(item => ({
-        id: item.id,
-        fields: item.fields
-      }));
-    } 
-    
-    else {
-      throw new Error("Invalid patch arguments");
+  if (!res.ok) throw new Error(`POST failed: ${res.status}`);
+
+  const json = await res.json();
+
+  apiresponse(
+    {
+      inserted: json.inserted,
+      insertedCount: json.insertedCount,
+      user: json.user
+    },
+    responsId
+  );
+}
+
+/* ----------------- PATCH ------------------ */
+async function patchNEON({
+  table,
+  data,          // single or bulk
+  responsId,
+  public: isPublic = false
+}) {
+  const url = `${API_BASE}/api/${table}`;
+
+  // Hvis data er én rad (single update)
+  let payload;
+
+  if (!Array.isArray(data)) {
+    // data = { id: 1, fields: {...} }  eller { id: 1, runnnr: 999 }
+    if (data.id && data.fields) {
+      payload = { id: data.id, data: data.fields };
+    } else {
+      // Hvis user skriver data: { id: 1, runnnr: 999 }
+      const { id, ...rest } = data;
+      payload = { id, data: rest };
     }
-  
-    const res = await fetch(`${API_BASE}/api/${table}`, {
-      method: "PATCH",
-      headers: buildHeaders(),
-      body: JSON.stringify(payload),
-    });
-  
-    if (!res.ok) throw new Error(`PATCH failed: ${res.status}`);
-  
-    const json = await res.json();
-    apiresponse(json.rows, responsId);
   }
-  
-  
 
-  /* ----------------- DELETE ----------------- */
-  async function delNEON(table, rowId,responsId) {
-    const res = await fetch(
-      `${API_BASE}/api/${table}?field=id&value=${rowId}`,
-      {
-        method: "DELETE",
-        headers: buildHeaders(),
+  // Hvis data er flere rader (bulk)
+  else {
+    payload = data.map(item => {
+      if (item.fields) {
+        return { id: item.id, fields: item.fields };
       }
-    );
 
-    if (!res.ok) throw new Error(`DELETE failed: ${res.status}`);
-
-    apiresponse(res.json(),responsId);
+      // støtte for data: [ { id: 1, runnnr: 99 }, ... ]
+      const { id, ...rest } = item;
+      return { id, fields: rest };
+    });
   }
+
+  const options = {
+    method: "PATCH",
+    headers: isPublic ? {} : buildHeaders(),
+    body: JSON.stringify(payload),
+  };
+
+  const res = await fetch(url, options);
+  if (!res.ok) throw new Error(`PATCH failed: ${res.status}`);
+
+  const json = await res.json();
+
+  apiresponse(
+    {
+      rows: json.rows,
+      updatedCount: json.updatedCount,
+      mode: json.mode,
+    },
+    responsId
+  );
+}
+
+/* ------------------ DELETE ------------------ */
+async function deleteNEON({ table, data, responsId }) {
+  if (data === undefined || data === null) {
+    throw new Error("deleteNEON requires 'data' to be an ID or array of IDs");
+  }
+
+  // Hvis brukeren sender et enkelt tall → gjør det om til array
+  const ids = Array.isArray(data) ? data : [data];
+
+  // value=1,2,3
+  const value = ids.join(",");
+
+  const url = `${API_BASE}/api/${table}?field=id&value=${value}`;
+
+  const res = await fetch(url, {
+    method: "DELETE",
+    headers: buildHeaders()
+  });
+
+  if (!res.ok) throw new Error(`DELETE failed: ${res.status}`);
+
+  const json = await res.json();
+
+  apiresponse(
+    {
+      deleted: json.deleted,
+      ids
+    },
+    responsId
+  );
+}
+
+
 
 
