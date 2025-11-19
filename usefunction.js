@@ -51,13 +51,6 @@ function useNEONCRUD() {
 }
 
 
-
-deleteNEON({
-  table: "bbrunning",
-  data: [1304, 1305, 1306],
-  responsId: "resp2"
-});
-
   
 
 

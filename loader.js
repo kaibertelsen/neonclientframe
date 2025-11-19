@@ -1,4 +1,9 @@
 
+/* Denne skal ligge i webflow
+<script src="https://kaibertelsen.github.io/neonclientframe/loader.js"></script>
+*/
+
+
     function loadScript(url) {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
