@@ -51,12 +51,12 @@ function useNEONCRUD() {
 }
 
 
-patchNEON({
+
+deleteNEON({
   table: "bbrunning",
-  data: [ { id: 1302, fields: { externalId: "Yes" } }, { id: 1303, fields: { externalId: "verdi" } } ],
+  data: [1304, 1305, 1306],
   responsId: "resp2"
 });
-
 
   
 
