@@ -38,28 +38,36 @@
 
 
 /* ------------------ GET ------------------ */
-function getNEON(
+function getNEON({
   table,
   fields = null,
   where = null,
   responsId,
-  useCache = false,
-  isPublic = false,
-  pagination = null 
-) {
+  cache = false,
+  public: isPublic = false,
+  pagination = null
+}) {
   let url = `${API_BASE}/api/${table}`;
   const params = new URLSearchParams();
 
+  // felt
   if (fields?.length) params.set("fields", fields.join(","));
-  if (where) Object.entries(where).forEach(([k, v]) => params.set(k, v));
-  if (useCache) params.set("cache", "1");
 
-  // Pagination
+  // where = { id: 5, status: "active" }
+  if (where) {
+    Object.entries(where).forEach(([k, v]) => params.set(k, v));
+  }
+
+  // cache
+  if (cache) params.set("cache", "1");
+
+  // pagination
   if (pagination && typeof pagination === "object") {
     if (pagination.limit != null) params.set("limit", String(pagination.limit));
     if (pagination.offset != null) params.set("offset", String(pagination.offset));
   }
 
+  // bygg URL
   if ([...params].length > 0) url += `?${params.toString()}`;
 
   const options = isPublic ? {} : { headers: buildHeaders() };
@@ -75,7 +83,7 @@ function getNEON(
           offset: json.offset,
           count: json.count,
           total: json.total,
-          hasMore: json.hasMore,
+          hasMore: json.hasMore
         },
         responsId
       )

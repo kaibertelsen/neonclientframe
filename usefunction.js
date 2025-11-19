@@ -14,9 +14,17 @@
 
     //getNEON("products", null, null, "resp3", false, true, false);
 
-    getNEON("bbrunning", null, null, "resp3", false, {
-      limit: 100,
-      offset: 200
+    getNEON({
+      table: "bbrunning",
+      fields: ["id", "runnnr"],
+      where: null,
+      responsId: "resp1",
+      cache: false,
+      public: false,
+      pagination: {
+        limit: 100,
+        offset: 0
+      }
     });
     
 
