@@ -36,51 +36,52 @@
     };
   }
 
-  /* ------------------ GET ------------------ */
-  function getNEON(
-    table,
-    fields = null,
-    where = null,
-    responsId,
-    useCache = false,
-    isPublic = false,
-    pagination = null   // <-- her kan du sende objekt eller false
-  ) {
-    let url = `${API_BASE}/api/${table}`;
-    const params = new URLSearchParams();
-  
-    if (fields?.length) params.set("fields", fields.join(","));
-    if (where) Object.entries(where).forEach(([k, v]) => params.set(k, v));
-    if (useCache) params.set("cache", "1");
-  
-    // Pagination bare hvis pagination er et objekt
-    if (pagination && typeof pagination === "object") {
-      if (pagination.limit) params.set("limit", pagination.limit);
-      if (pagination.offset) params.set("offset", pagination.offset);
-    }
-  
-    // Hvis pagination === false ➜ legg INGENTING til
-    // Da henter backend ALLE rader
-  
-    if ([...params].length > 0) url += `?${params.toString()}`;
-  
-    const options = isPublic ? {} : { headers: buildHeaders() };
-  
-    fetch(url, options)
-      .then(res => res.json())
-      .then(json =>
-        apiresponse(
-          {
-            rows: json.rows,
-            cached: json.cached,
-            limit: json.limit,
-            offset: json.offset,
-            count: json.count
-          },
-          responsId
-        )
-      );
+
+/* ------------------ GET ------------------ */
+function getNEON(
+  table,
+  fields = null,
+  where = null,
+  responsId,
+  useCache = false,
+  isPublic = false,
+  pagination = null 
+) {
+  let url = `${API_BASE}/api/${table}`;
+  const params = new URLSearchParams();
+
+  if (fields?.length) params.set("fields", fields.join(","));
+  if (where) Object.entries(where).forEach(([k, v]) => params.set(k, v));
+  if (useCache) params.set("cache", "1");
+
+  // Pagination
+  if (pagination && typeof pagination === "object") {
+    if (pagination.limit != null) params.set("limit", String(pagination.limit));
+    if (pagination.offset != null) params.set("offset", String(pagination.offset));
   }
+
+  if ([...params].length > 0) url += `?${params.toString()}`;
+
+  const options = isPublic ? {} : { headers: buildHeaders() };
+
+  fetch(url, options)
+    .then(res => res.json())
+    .then(json =>
+      apiresponse(
+        {
+          rows: json.rows,
+          cached: json.cached,
+          limit: json.limit,
+          offset: json.offset,
+          count: json.count,
+          total: json.total,
+          hasMore: json.hasMore,
+        },
+        responsId
+      )
+    );
+}
+
   
   
   
