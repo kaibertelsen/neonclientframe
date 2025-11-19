@@ -49,17 +49,13 @@ function useNEONCRUD() {
     responsId: "resp2"
   });
 }
-postNEON({
+
+
+patchNEON({
   table: "bbrunning",
-  data: [
-    { runnnr: 777, externalId: "webflow-test-multi" },
-    { runnnr: 888, externalId: "webflow-test-multi" },
-    { runnnr: 999, externalId: "webflow-test-multi" }
-  ],
+  data: [ { id: 1302, fields: { externalId: "Yes" } }, { id: 1303, fields: { externalId: "verdi" } } ],
   responsId: "resp2"
 });
-
-   
 
 
   
