@@ -50,7 +50,18 @@ function useNEONCRUD() {
   });
 }
 
-
+getNEON({
+  table: "bbrunning",
+  fields: ["id", "runnnr"],
+  where: null,
+  responsId: "resp1",
+  cache: false,
+  public: false,
+  pagination: {
+    limit: 100,
+    offset: 0
+  }
+});
   
 
 
