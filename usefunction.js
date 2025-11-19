@@ -49,18 +49,14 @@ function useNEONCRUD() {
     responsId: "resp2"
   });
 }
-
-getNEON({
+postNEON({
   table: "bbrunning",
-  fields: ["id", "runnnr"],
-  where: null,
-  responsId: "resp1",
-  cache: false,
-  public: false,
-  pagination: {
-    limit: 100,
-    offset: 0
-  }
+  data: [
+    { runnnr: 777, externalId: "webflow-test-multi" },
+    { runnnr: 888, externalId: "webflow-test-multi" },
+    { runnnr: 999, externalId: "webflow-test-multi" }
+  ],
+  responsId: "resp2"
 });
 
    
