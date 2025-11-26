@@ -52,15 +52,12 @@ function useNEONCRUD() {
 
 getNEON({
   table: "bbrunning",
-  fields: ["id", "runnnr"],
+  fields: null,
   where: null,
   responsId: "resp1",
   cache: false,
   public: false,
-  pagination: {
-    limit: 100,
-    offset: 0
-  }
+  pagination: null
 });
   
 
