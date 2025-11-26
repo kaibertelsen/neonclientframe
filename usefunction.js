@@ -53,7 +53,7 @@ function useNEONCRUD() {
 getNEON({
   table: "bbrunning",
   fields: null,
-  where: null,
+  where: { runnnr: 777 },
   responsId: "resp1",
   cache: false,
   public: false,
