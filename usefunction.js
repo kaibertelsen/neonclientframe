@@ -51,9 +51,9 @@ function useNEONCRUD() {
 }
 
 getNEON({
-  table: "bbrunning",
+  table: "users",
   fields: null,
-  where: { runnnr: 777 },
+  where: { auth_id: "mem_sb_cmi4ny448009m0sr4ew3hdge1" },
   responsId: "resp1",
   cache: false,
   public: false,
