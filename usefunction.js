@@ -50,6 +50,16 @@ function useNEONCRUD() {
   });
 }
 
+postNEON({
+  table: "companies",
+  data: [
+    { runnnr: 777, externalId: "webflow-test" },
+    { runnnr: 888, externalId: "webflow-test" },
+    { runnnr: 999, externalId: "webflow-test" }
+  ],
+  responsId: "resp2"
+});
+
 getNEON({
   table: "users",
   fields: null,

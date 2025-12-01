@@ -1,9 +1,32 @@
-// UMD module for Neon API Client
+/* --------------------------------------------
+   UMD module for Neon API Client (API + MS)
+--------------------------------------------- */
 
 const API_BASE = "https://attentiocloud-api.vercel.app";
 
-//utvide til å ikke bruke memberstack men appid og apikey?
+/* -------------------------------------------------------
+   API-MODUS: Lagra appId + apiKey (frivilligt)
+-------------------------------------------------------- */
+function setApiCredentials(appId, apiKey) {
+  localStorage.setItem("neon_appId", appId);
+  localStorage.setItem("neon_apiKey", apiKey);
+}
 
+function clearApiCredentials() {
+  localStorage.removeItem("neon_appId");
+  localStorage.removeItem("neon_apiKey");
+}
+
+function getApiCredentials() {
+  return {
+    appId: localStorage.getItem("neon_appId"),
+    apiKey: localStorage.getItem("neon_apiKey"),
+  };
+}
+
+/* -------------------------------------------------------
+   MEMBERSTACK-MODUS (fallback)
+-------------------------------------------------------- */
 function getToken() {
   return (
     localStorage.getItem("_ms-mid") ||
@@ -20,14 +43,32 @@ function getPlans() {
   if (!raw) return [];
   try {
     const obj = JSON.parse(raw);
-    return (obj.planConnections || []).map(p => p.planId);
+    return (obj.planConnections || []).map((p) => p.planId);
   } catch (e) {
     console.warn("Invalid _ms-mem JSON", e);
     return [];
   }
 }
 
+/* -------------------------------------------------------
+   HOVED-BYGGING AV HEADERS
+   PRIORITET:
+   1. API-MODUS hvis appId + apiKey finnes
+   2. Ellers Memberstack
+-------------------------------------------------------- */
 function buildHeaders() {
+  const { appId, apiKey } = getApiCredentials();
+
+  // --- API MODE ---
+  if (appId && apiKey) {
+    return {
+      "Content-Type": "application/json",
+      "X-APP-ID": appId,
+      Authorization: `Bearer ${apiKey}`,
+    };
+  }
+
+  // --- MEMBERSTACK MODE ---
   const token = getToken();
   if (!token) throw new Error("Missing Memberstack token (_ms-mid)");
 
@@ -38,44 +79,29 @@ function buildHeaders() {
   };
 }
 
-/* ------------------ GET ------------------ */
-function getNEON({
-  table,
-  fields = null,
-  where = null,
-  responsId,
-  cache = false,
-  public: isPublic = false,
-  pagination = null
-}) {
+/* -------------------------------------------------------
+   GET
+-------------------------------------------------------- */
+function getNEON({ table, fields = null, where = null, responsId, cache = false, public: isPublic = false, pagination = null }) {
   let url = `${API_BASE}/api/${table}`;
   const params = new URLSearchParams();
 
-  // felt
   if (fields?.length) params.set("fields", fields.join(","));
-
-  // where = { id: 5, status: "active" }
-  if (where) {
-    Object.entries(where).forEach(([k, v]) => params.set(k, v));
-  }
-
-  // cache
+  if (where) Object.entries(where).forEach(([k, v]) => params.set(k, v));
   if (cache) params.set("cache", "1");
 
-  // pagination
-  if (pagination && typeof pagination === "object") {
+  if (pagination) {
     if (pagination.limit != null) params.set("limit", String(pagination.limit));
     if (pagination.offset != null) params.set("offset", String(pagination.offset));
   }
 
-  // bygg URL
   if ([...params].length > 0) url += `?${params.toString()}`;
 
   const options = isPublic ? {} : { headers: buildHeaders() };
 
   fetch(url, options)
-    .then(res => res.json())
-    .then(json =>
+    .then((res) => res.json())
+    .then((json) =>
       apiresponse(
         {
           rows: json.rows,
@@ -84,91 +110,68 @@ function getNEON({
           offset: json.offset,
           count: json.count,
           total: json.total,
-          hasMore: json.hasMore
+          hasMore: json.hasMore,
         },
         responsId
       )
     );
 }
 
-/* ------------------ POST ------------------ */
-async function postNEON({
-  table,
-  data,
-  responsId,
-  public: isPublic = false
-}) {
+/* -------------------------------------------------------
+   POST
+-------------------------------------------------------- */
+async function postNEON({ table, data, responsId, public: isPublic = false }) {
   const url = `${API_BASE}/api/${table}`;
-
-  const options = {
+  const res = await fetch(url, {
     method: "POST",
     headers: isPublic ? {} : buildHeaders(),
     body: JSON.stringify(Array.isArray(data) ? data : [data]),
-  };
-
-  const res = await fetch(url, options);
+  });
 
   if (!res.ok) throw new Error(`POST failed: ${res.status}`);
 
   const json = await res.json();
-
   apiresponse(
     {
       inserted: json.inserted,
       insertedCount: json.insertedCount,
-      user: json.user
+      user: json.user,
     },
     responsId
   );
 }
 
-/* ----------------- PATCH ------------------ */
-async function patchNEON({
-  table,
-  data,          // single or bulk
-  responsId,
-  public: isPublic = false
-}) {
+/* -------------------------------------------------------
+   PATCH
+-------------------------------------------------------- */
+async function patchNEON({ table, data, responsId, public: isPublic = false }) {
   const url = `${API_BASE}/api/${table}`;
 
-  // Hvis data er én rad (single update)
   let payload;
-
   if (!Array.isArray(data)) {
-    // data = { id: 1, fields: {...} }  eller { id: 1, runnnr: 999 }
     if (data.id && data.fields) {
       payload = { id: data.id, data: data.fields };
     } else {
-      // Hvis user skriver data: { id: 1, runnnr: 999 }
       const { id, ...rest } = data;
       payload = { id, data: rest };
     }
-  }
-
-  // Hvis data er flere rader (bulk)
-  else {
-    payload = data.map(item => {
-      if (item.fields) {
-        return { id: item.id, fields: item.fields };
-      }
-
-      // støtte for data: [ { id: 1, runnnr: 99 }, ... ]
+  } else {
+    payload = data.map((item) => {
+      if (item.fields) return { id: item.id, fields: item.fields };
       const { id, ...rest } = item;
       return { id, fields: rest };
     });
   }
 
-  const options = {
+  const res = await fetch(url, {
     method: "PATCH",
     headers: isPublic ? {} : buildHeaders(),
     body: JSON.stringify(payload),
-  };
+  });
 
-  const res = await fetch(url, options);
   if (!res.ok) throw new Error(`PATCH failed: ${res.status}`);
 
   const json = await res.json();
-
   apiresponse(
     {
       rows: json.rows,
@@ -179,23 +182,18 @@ async function patchNEON({
   );
 }
 
-/* ------------------ DELETE ------------------ */
+/* -------------------------------------------------------
+   DELETE
+-------------------------------------------------------- */
 async function deleteNEON({ table, data, responsId }) {
-  if (data === undefined || data === null) {
-    throw new Error("deleteNEON requires 'data' to be an ID or array of IDs");
-  }
-
-  // Hvis brukeren sender et enkelt tall → gjør det om til array
   const ids = Array.isArray(data) ? data : [data];
-
-  // value=1,2,3
   const value = ids.join(",");
 
   const url = `${API_BASE}/api/${table}?field=id&value=${value}`;
 
   const res = await fetch(url, {
     method: "DELETE",
-    headers: buildHeaders()
+    headers: buildHeaders(),
   });
 
   if (!res.ok) throw new Error(`DELETE failed: ${res.status}`);
@@ -205,12 +203,8 @@ async function deleteNEON({ table, data, responsId }) {
   apiresponse(
     {
       deleted: json.deleted,
-      ids
+      ids,
     },
     responsId
   );
 }
-
-
-
-
