@@ -79,21 +79,6 @@ function buildHeaders() {
   };
 }
 
-function cleanWhere(where) {
-    if (!where) return null;
-  
-    const forbidden = ["authId", "member", "ms", "msId", "memberId"];
-    const cleaned = {};
-  
-    for (const [key, value] of Object.entries(where)) {
-      if (forbidden.includes(key)) continue;
-      if (String(value).startsWith("mem_")) continue; // blokker Memberstack IDs
-  
-      cleaned[key] = value;
-    }
-  
-    return Object.keys(cleaned).length > 0 ? cleaned : null;
-  }
   
 
 /* -------------------------------------------------------
@@ -112,7 +97,7 @@ function getNEON({
     const params = new URLSearchParams();
   
     // Fjern authId / Memberstack junk
-    const safeWhere = cleanWhere(where);
+    const safeWhere = where;
   
     // fields
     if (fields?.length) params.set("fields", fields.join(","));
