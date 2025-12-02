@@ -79,43 +79,82 @@ function buildHeaders() {
   };
 }
 
+function cleanWhere(where) {
+    if (!where) return null;
+  
+    const forbidden = ["authId", "member", "ms", "msId", "memberId"];
+    const cleaned = {};
+  
+    for (const [key, value] of Object.entries(where)) {
+      if (forbidden.includes(key)) continue;
+      if (String(value).startsWith("mem_")) continue; // blokker Memberstack IDs
+  
+      cleaned[key] = value;
+    }
+  
+    return Object.keys(cleaned).length > 0 ? cleaned : null;
+  }
+  
+
 /* -------------------------------------------------------
    GET
 -------------------------------------------------------- */
-function getNEON({ table, fields = null, where = null, responsId, cache = false, public: isPublic = false, pagination = null }) {
-  let url = `${API_BASE}/api/${table}`;
-  const params = new URLSearchParams();
-
-  if (fields?.length) params.set("fields", fields.join(","));
-  if (where) Object.entries(where).forEach(([k, v]) => params.set(k, v));
-  if (cache) params.set("cache", "1");
-
-  if (pagination) {
-    if (pagination.limit != null) params.set("limit", String(pagination.limit));
-    if (pagination.offset != null) params.set("offset", String(pagination.offset));
+function getNEON({
+    table,
+    fields = null,
+    where = null,
+    responsId,
+    cache = false,
+    public: isPublic = false,
+    pagination = null
+  }) {
+    let url = `${API_BASE}/api/${table}`;
+    const params = new URLSearchParams();
+  
+    // Fjern authId / Memberstack junk
+    const safeWhere = cleanWhere(where);
+  
+    // fields
+    if (fields?.length) params.set("fields", fields.join(","));
+  
+    // where → kun “rene” kolonner
+    if (safeWhere) {
+      Object.entries(safeWhere).forEach(([k, v]) => params.set(k, v));
+    }
+  
+    // cache
+    if (cache) params.set("cache", "1");
+  
+    // pagination
+    if (pagination) {
+      if (pagination.limit != null) params.set("limit", String(pagination.limit));
+      if (pagination.offset != null) params.set("offset", String(pagination.offset));
+    }
+  
+    // build URL
+    if ([...params].length > 0) url += `?${params.toString()}`;
+  
+    // headers
+    const options = isPublic ? {} : { headers: buildHeaders() };
+  
+    fetch(url, options)
+      .then((res) => res.json())
+      .then((json) =>
+        apiresponse(
+          {
+            rows: json.rows,
+            cached: json.cached,
+            limit: json.limit,
+            offset: json.offset,
+            count: json.count,
+            total: json.total,
+            hasMore: json.hasMore,
+          },
+          responsId
+        )
+      );
   }
-
-  if ([...params].length > 0) url += `?${params.toString()}`;
-
-  const options = isPublic ? {} : { headers: buildHeaders() };
-
-  fetch(url, options)
-    .then((res) => res.json())
-    .then((json) =>
-      apiresponse(
-        {
-          rows: json.rows,
-          cached: json.cached,
-          limit: json.limit,
-          offset: json.offset,
-          count: json.count,
-          total: json.total,
-          hasMore: json.hasMore,
-        },
-        responsId
-      )
-    );
-}
+  
 
 /* -------------------------------------------------------
    POST
